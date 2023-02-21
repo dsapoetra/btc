@@ -1,0 +1,17 @@
+info:
+  contact: {}
+paths:
+  /v1/health:
+    get:
+      consumes:
+      - application/json
+      description: Get health status.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: get health status or 500
+      tags:
+      - Health
+swagger: "2.0"
