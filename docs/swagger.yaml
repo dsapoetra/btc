@@ -1,3 +1,13 @@
+definitions:
+  model.Transaction:
+    properties:
+      amount:
+        type: number
+      createdAt:
+        type: string
+      id:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
@@ -14,4 +24,28 @@ paths:
       summary: get health status or 500
       tags:
       - Health
+  /v1/transaction:
+    post:
+      consumes:
+      - application/json
+      description: Create transaction.
+      parameters:
+      - description: Transaction
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/model.Transaction'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Transaction'
+      security:
+      - ApiKeyAuth: []
+      summary: create transaction
+      tags:
+      - Transaction
 swagger: "2.0"
