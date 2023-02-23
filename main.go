@@ -2,12 +2,16 @@ package main
 
 import (
 	"btc/app/handler"
+	"btc/app/repository"
 	"btc/app/routes"
 	"btc/app/service"
+	"btc/pkg"
+	"btc/pkg/db"
 	"btc/pkg/server"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"log"
 
 	_ "btc/docs"                          // load API Docs files (Swagger)
 	_ "github.com/joho/godotenv/autoload" // load .env file automatically
@@ -15,35 +19,30 @@ import (
 
 func main() {
 	// Define Fiber config.
-	//config := configs.FiberConfig()
+	config := pkg.FiberConfig()
 
 	// Define a new Fiber app with config.
-	app := fiber.New()
+	app := fiber.New(config)
 
-	//db, _ := database.PostgreSQLConnection()
-	//articleRepo := repository.NewArticleRepository(db)
-	//articleSvc := service.NewArticleService(articleRepo)
+	db, err := db.PostgreSQLConnection()
 
-	//authorRepo := repository.NewAuthorRepository(nil)
-	//authorSvc := service.NewAuthorService(authorRepo)
+	if err != nil {
+		log.Println("Error connecting to database: ", err)
+	}
+
+	transactionRepo := repository.NewTransactionRepository(db)
+	transactionService := service.NewTransactionService(transactionRepo)
 
 	healthService := service.NewHealthService()
 
-	//// Middlewares.
-	//middleware.FiberMiddleware(app) // Register Fiber's middleware for app.
-
-	//// Routes.
+	// Routes.
 	routes.SwaggerRoute(app) // Register a route for API Docs (Swagger).
-	//routes.PrivateRoutes(app) // Register a private routes for app.
-	//routes.NotFoundRoute(app) // Register route for 404 Error.
 
 	api := app.Group("/v1")
-	//app.Get("/health", func(ctx *fiber.Ctx) error {
-	//	return ctx.JSON("ok")
-	//})
 
 	// Prepare our endpoints for the API.
 	handler.NewHealthHandler(api.Group("/"), healthService)
+	handler.NewTransactionHandler(api.Group("/"), transactionService)
 
 	app.Use(
 		// Add CORS to each route.
