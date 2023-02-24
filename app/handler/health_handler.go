@@ -22,7 +22,6 @@ func HealthCheck(healthService service.IHealthService) fiber.Handler {
 		err := healthService.HealthCheck()
 
 		if err != nil {
-			// Return, if book not found.
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": true,
 				"msg":   err.Error(),
