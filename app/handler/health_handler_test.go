@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func Test_Handler_createBankAccount(t *testing.T) {
+func Test_Handler_Health(t *testing.T) {
 	tests := []struct {
 		description string
 

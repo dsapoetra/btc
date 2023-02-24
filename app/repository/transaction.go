@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"btc/app/model"
+	"btc/app/model/repo"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -10,7 +10,7 @@ type TransactionRepository struct {
 }
 
 type ITransactionRepository interface {
-	AddTransaction(trx model.Transaction) error
+	AddTransaction(trx repo.Transaction) error
 	//ListTransaction(startTime time.Time, endTime time.Time) ([]model.Transaction, error)
 }
 
@@ -20,13 +20,10 @@ func NewTransactionRepository(db *sqlx.DB) ITransactionRepository {
 	}
 }
 
-func (t *TransactionRepository) AddTransaction(trx model.Transaction) error {
+func (t *TransactionRepository) AddTransaction(trx repo.Transaction) error {
 	query := `INSERT INTO transactions(amount, created_at) VALUES ($1, $2)`
 
 	_, err := t.db.Exec(query, trx.Amount, trx.CreatedAt)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }

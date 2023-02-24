@@ -1,9 +1,9 @@
 package service
 
 import (
-	"btc/app/model"
+	"btc/app/model/repo"
 	"btc/app/repository"
-	"log"
+	"errors"
 )
 
 type TransactionService struct {
@@ -11,7 +11,7 @@ type TransactionService struct {
 }
 
 type ITransactionService interface {
-	AddTransaction(trx model.Transaction) (*model.Transaction, error)
+	AddTransaction(trx repo.Transaction) error
 }
 
 func NewTransactionService(repo repository.ITransactionRepository) ITransactionService {
@@ -20,13 +20,13 @@ func NewTransactionService(repo repository.ITransactionRepository) ITransactionS
 	}
 }
 
-func (t *TransactionService) AddTransaction(trx model.Transaction) (*model.Transaction, error) {
-	log.Println("HERE 2")
-	err := t.db.AddTransaction(trx)
+func (t *TransactionService) AddTransaction(trx repo.Transaction) error {
 
-	if err != nil {
-		return nil, err
+	if trx.Amount <= 1 {
+		return errors.New("amount must be greater than 1")
 	}
 
-	return nil, nil
+	err := t.db.AddTransaction(trx)
+
+	return err
 }
