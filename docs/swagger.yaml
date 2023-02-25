@@ -1,14 +1,12 @@
 definitions:
-  model.Transaction:
+  http_model.Transaction:
     properties:
       amount:
         type: number
       created_at:
         type: string
-      id:
-        type: integer
     type: object
-  model.TransactionRequest:
+  repo.Transaction:
     properties:
       amount:
         type: number
@@ -32,6 +30,33 @@ paths:
       tags:
       - Health
   /v1/transaction:
+    get:
+      consumes:
+      - application/json
+      description: Create transaction.
+      parameters:
+      - description: Start Time
+        in: query
+        name: start_time
+        required: true
+        type: string
+      - description: End Time
+        in: query
+        name: end_time
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/repo.Transaction'
+      security:
+      - ApiKeyAuth: []
+      summary: create transaction
+      tags:
+      - Transaction
     post:
       consumes:
       - application/json
@@ -42,14 +67,14 @@ paths:
         name: transaction
         required: true
         schema:
-          $ref: '#/definitions/model.TransactionRequest'
+          $ref: '#/definitions/http_model.Transaction'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Transaction'
+            $ref: '#/definitions/repo.Transaction'
       security:
       - ApiKeyAuth: []
       summary: create transaction
