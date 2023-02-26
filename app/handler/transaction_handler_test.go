@@ -25,6 +25,9 @@ func Test_Post_Transaction(t *testing.T) {
 		mockService *mock_service.MockITransactionService
 	}
 
+	timeNow := time.Now().Local()
+	timeNowStr := timeNow.Format(time.RFC3339)
+
 	tests := []struct {
 		description string
 
@@ -42,13 +45,9 @@ func Test_Post_Transaction(t *testing.T) {
 			expectedError: false,
 			expectedCode:  200,
 			expectedBody:  "{\"error\":false,\"msg\":\"Success inserted transaction\"}",
-			requestBody:   "{\"amount\":100,\"datetime\":\"2006-01-02T00:00:00+00:00\"}",
+			requestBody:   "{\"amount\":100,\"datetime\":" + timeNowStr + "}",
 			prepare: func(f *TransactionHandler) {
-				createdAt := "2006-01-02T00:00:00+00:00"
-				timeCreated, _ := time.Parse(time.RFC3339, createdAt)
-				timeCreated = timeCreated.Local()
-
-				trxRepo := repo.Transaction{CreatedAt: timeCreated, Amount: 100}
+				trxRepo := repo.Transaction{CreatedAt: timeNow, Amount: 100}
 				f.mockService.EXPECT().AddTransaction(mock.MatchedBy(func(ctx context.Context) bool { return true }), trxRepo).Return(nil)
 
 			},
@@ -67,12 +66,9 @@ func Test_Post_Transaction(t *testing.T) {
 			expectedError: false,
 			expectedCode:  400,
 			expectedBody:  "{\"error\":true,\"msg\":\"amount can't be zero\"}",
-			requestBody:   "{\"amount\":0,\"datetime\":\"2006-01-02T00:00:00+00:00\"}",
+			requestBody:   "{\"amount\":0,\"datetime\":" + timeNowStr + "}",
 			prepare: func(f *TransactionHandler) {
-				createdAt := "2006-01-02T00:00:00+00:00"
-				timeCreated, _ := time.Parse(time.RFC3339, createdAt)
-
-				trxRepo := repo.Transaction{CreatedAt: timeCreated.Local(), Amount: 0}
+				trxRepo := repo.Transaction{CreatedAt: timeNow, Amount: 0}
 				f.mockService.EXPECT().AddTransaction(mock.MatchedBy(func(ctx context.Context) bool { return true }), trxRepo).Return(errors.New("amount can't be zero"))
 
 			},
