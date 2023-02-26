@@ -46,7 +46,7 @@ func Test_Post_Transaction(t *testing.T) {
 			prepare: func(f *TransactionHandler) {
 				createdAt := "2006-01-02T00:00:00+07:00"
 				timeCreated, _ := time.Parse(time.RFC3339, createdAt)
-				timeCreated = timeCreated.Local()
+				//timeCreated = timeCreated
 
 				trxRepo := repo.Transaction{CreatedAt: timeCreated, Amount: 100}
 				f.mockService.EXPECT().AddTransaction(mock.MatchedBy(func(ctx context.Context) bool { return true }), trxRepo).Return(nil)
