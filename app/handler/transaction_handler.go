@@ -44,7 +44,7 @@ func CreateTransaction(transactionService service.ITransactionService) fiber.Han
 		}
 
 		param := repo.Transaction{
-			CreatedAt: createdAt.Local(),
+			CreatedAt: createdAt.UTC(),
 			Amount:    body.Amount,
 		}
 
@@ -98,7 +98,7 @@ func GetTransaction(transactionService service.ITransactionService) fiber.Handle
 			})
 		}
 
-		res, err := transactionService.ListTransaction(c.Context(), startTime, endTime)
+		res, err := transactionService.ListTransaction(c.Context(), startTime.UTC(), endTime.UTC())
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": true,

@@ -5,6 +5,7 @@ import (
 	mock_service "btc/test/mock/app/service"
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -24,9 +25,8 @@ func Test_Post_Transaction(t *testing.T) {
 		mockService *mock_service.MockITransactionService
 	}
 
-	timeNowStr := "2023-02-26T23:13:04+00:00"
-	timeNow, _ := time.Parse(time.RFC3339, "2023-02-26T23:13:04+00:00")
-	//timeNow = timeNow.Local()
+	timeNow, _ := time.Parse(time.RFC3339, "2023-02-26T22:05:52+00:00")
+	timeNowInput := timeNow.Format(time.RFC3339)
 
 	tests := []struct {
 		description string
@@ -45,42 +45,39 @@ func Test_Post_Transaction(t *testing.T) {
 			expectedError: false,
 			expectedCode:  200,
 			expectedBody:  "{\"error\":false,\"msg\":\"Success inserted transaction\"}",
-			requestBody:   "{\"amount\":100,\"datetime\":\"" + timeNowStr + "\"}",
+			requestBody:   "{\"amount\":100,\"datetime\":\"" + timeNowInput + "\"}",
 			prepare: func(f *TransactionHandler) {
-				trxRepo := repo.Transaction{CreatedAt: timeNow.Local(), Amount: 100}
+				trxRepo := repo.Transaction{CreatedAt: timeNow.UTC(), Amount: 100}
 				f.mockService.EXPECT().AddTransaction(mock.MatchedBy(func(ctx context.Context) bool { return true }), trxRepo).Return(nil)
 
 			},
 		},
-		//{
-		//	description:   "wrong datetime fotrmat add transaction route",
-		//	route:         "/v1/transaction",
-		//	expectedError: false,
-		//	expectedCode:  400,
-		//	expectedBody:  "{\"error\":true,\"msg\":\"parsing time \\\"2006-01-02T00:07:00\\\" as \\\"2006-01-02T15:04:05Z07:00\\\": cannot parse \\\"\\\" as \\\"Z07:00\\\"\"}",
-		//	requestBody:   "{\"amount\":100,\"datetime\":\"2006-01-02T00:07:00\"}",
-		//},
-		//{
-		//	description:   "amount is 0 add transaction route",
-		//	route:         "/v1/transaction",
-		//	expectedError: false,
-		//	expectedCode:  400,
-		//	expectedBody:  "{\"error\":true,\"msg\":\"amount can't be zero\"}",
-		//	requestBody:   "{\"amount\":0,\"datetime\":\"" + timeNowStr + "\"}",
-		//	prepare: func(f *TransactionHandler) {
-		//		trxRepo := repo.Transaction{CreatedAt: timeNow, Amount: 0}
-		//		f.mockService.EXPECT().AddTransaction(mock.MatchedBy(func(ctx context.Context) bool { return true }), trxRepo).Return(errors.New("amount can't be zero"))
-		//
-		//	},
-		//},
+		{
+			description:   "wrong datetime fotrmat add transaction route",
+			route:         "/v1/transaction",
+			expectedError: false,
+			expectedCode:  400,
+			expectedBody:  "{\"error\":true,\"msg\":\"parsing time \\\"2006-01-02T00:07:00\\\" as \\\"2006-01-02T15:04:05Z07:00\\\": cannot parse \\\"\\\" as \\\"Z07:00\\\"\"}",
+			requestBody:   "{\"amount\":100,\"datetime\":\"2006-01-02T00:07:00\"}",
+		},
+		{
+			description:   "amount is 0 add transaction route",
+			route:         "/v1/transaction",
+			expectedError: false,
+			expectedCode:  400,
+			expectedBody:  "{\"error\":true,\"msg\":\"amount can't be zero\"}",
+			requestBody:   "{\"amount\":0,\"datetime\":\"" + timeNowInput + "\"}",
+			prepare: func(f *TransactionHandler) {
+				trxRepo := repo.Transaction{CreatedAt: timeNow.UTC(), Amount: 0}
+				f.mockService.EXPECT().AddTransaction(mock.MatchedBy(func(ctx context.Context) bool { return true }), trxRepo).Return(errors.New("amount can't be zero"))
+
+			},
+		},
 	}
 
 	for _, test := range tests {
 
 		t.Run(test.description, func(t *testing.T) {
-			log.Println("haha1", timeNowStr)
-			log.Println("haha1", timeNow)
-
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
 			f := TransactionHandler{
@@ -164,7 +161,7 @@ func Test_Get_Transaction(t *testing.T) {
 			requestQueryStartTime: timeNowInput,
 			requestQueryEndTime:   timeHourLaterInput,
 			prepare: func(f *TransactionHandler) {
-				f.mockService.EXPECT().ListTransaction(mock.MatchedBy(func(ctx context.Context) bool { return true }), timeNow.Local(), timeHourLater.Local()).Return(trxRepo, nil)
+				f.mockService.EXPECT().ListTransaction(mock.MatchedBy(func(ctx context.Context) bool { return true }), timeNow.UTC(), timeHourLater.UTC()).Return(trxRepo, nil)
 			},
 		},
 	}
