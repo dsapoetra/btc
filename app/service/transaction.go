@@ -25,8 +25,8 @@ func NewTransactionService(repo repository.ITransactionRepository) ITransactionS
 
 func (t *TransactionService) AddTransaction(ctx context.Context, trx repo.Transaction) error {
 
-	if trx.Amount < 1 {
-		return errors.New("amount must be greater than 1")
+	if trx.Amount == 0 {
+		return errors.New("amount can't be zero")
 	}
 
 	err := t.db.AddTransaction(ctx, trx)

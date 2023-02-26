@@ -42,10 +42,11 @@ func Test_Post_Transaction(t *testing.T) {
 			expectedError: false,
 			expectedCode:  200,
 			expectedBody:  "{\"error\":false,\"msg\":\"Success inserted transaction\"}",
-			requestBody:   "{\"amount\":100,\"datetime\":\"2006-01-02T00:00:00+00:00\"}",
+			requestBody:   "{\"amount\":100,\"datetime\":\"2006-01-02T00:00:00+07:00\"}",
 			prepare: func(f *TransactionHandler) {
-				createdAt := "2006-01-02T00:00:00+00:00"
+				createdAt := "2006-01-02T00:00:00+07:00"
 				timeCreated, _ := time.Parse(time.RFC3339, createdAt)
+				timeCreated = timeCreated.Local()
 
 				trxRepo := repo.Transaction{CreatedAt: timeCreated, Amount: 100}
 				f.mockService.EXPECT().AddTransaction(mock.MatchedBy(func(ctx context.Context) bool { return true }), trxRepo).Return(nil)
@@ -57,22 +58,22 @@ func Test_Post_Transaction(t *testing.T) {
 			route:         "/v1/transaction",
 			expectedError: false,
 			expectedCode:  400,
-			expectedBody:  "{\"error\":true,\"msg\":\"parsing time \\\"2006-01-02T00:00:00\\\" as \\\"2006-01-02T15:04:05Z07:00\\\": cannot parse \\\"\\\" as \\\"Z07:00\\\"\"}",
-			requestBody:   "{\"amount\":100,\"datetime\":\"2006-01-02T00:00:00\"}",
+			expectedBody:  "{\"error\":true,\"msg\":\"parsing time \\\"2006-01-02T00:07:00\\\" as \\\"2006-01-02T15:04:05Z07:00\\\": cannot parse \\\"\\\" as \\\"Z07:00\\\"\"}",
+			requestBody:   "{\"amount\":100,\"datetime\":\"2006-01-02T00:07:00\"}",
 		},
 		{
-			description:   "amount is less than 1 add transaction route",
+			description:   "amount is 0 add transaction route",
 			route:         "/v1/transaction",
 			expectedError: false,
 			expectedCode:  400,
-			expectedBody:  "{\"error\":true,\"msg\":\"amount must be greater than 1\"}",
-			requestBody:   "{\"amount\":0,\"datetime\":\"2006-01-02T00:00:00+00:00\"}",
+			expectedBody:  "{\"error\":true,\"msg\":\"amount can't be zero\"}",
+			requestBody:   "{\"amount\":0,\"datetime\":\"2006-01-02T00:00:00+07:00\"}",
 			prepare: func(f *TransactionHandler) {
-				createdAt := "2006-01-02T00:00:00+00:00"
+				createdAt := "2006-01-02T00:00:00+07:00"
 				timeCreated, _ := time.Parse(time.RFC3339, createdAt)
 
 				trxRepo := repo.Transaction{CreatedAt: timeCreated, Amount: 0}
-				f.mockService.EXPECT().AddTransaction(mock.MatchedBy(func(ctx context.Context) bool { return true }), trxRepo).Return(errors.New("amount must be greater than 1"))
+				f.mockService.EXPECT().AddTransaction(mock.MatchedBy(func(ctx context.Context) bool { return true }), trxRepo).Return(errors.New("amount can't be zero"))
 
 			},
 		},
