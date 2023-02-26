@@ -2,10 +2,8 @@ package handler
 
 import (
 	"btc/app/model/http-model"
-	"btc/app/model/repo"
 	"btc/app/service"
 	"github.com/gofiber/fiber/v2"
-	"time"
 )
 
 func NewTransactionHandler(app fiber.Router, transactionService service.ITransactionService) {
@@ -34,21 +32,7 @@ func CreateTransaction(transactionService service.ITransactionService) fiber.Han
 			})
 		}
 
-		createdAt, err := time.Parse(time.RFC3339, body.DateTime)
-
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": true,
-				"msg":   err.Error(),
-			})
-		}
-
-		param := repo.Transaction{
-			CreatedAt: createdAt.UTC(),
-			Amount:    body.Amount,
-		}
-
-		err = transactionService.AddTransaction(c.Context(), param)
+		err := transactionService.AddTransaction(c.Context(), *body)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": true,
@@ -70,35 +54,17 @@ func CreateTransaction(transactionService service.ITransactionService) fiber.Han
 // @Tags Transaction
 // @Accept json
 // @Produce json
-// @Param start_time query string true "Start Time"
-// @Param end_time query string true "End Time"
+// @Param startDateTime query string true "Start Time"
+// @Param endDateTime query string true "End Time"
 // @Success 200 {object} []repo.Transaction
 // @Security ApiKeyAuth
 // @Router /v1/transaction [get]
 func GetTransaction(transactionService service.ITransactionService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		st := c.Query("start_time")
-		et := c.Query("end_time")
+		st := c.Query("startDateTime")
+		et := c.Query("endDateTime")
 
-		startTime, err := time.Parse(time.RFC3339, st)
-
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": true,
-				"msg":   err.Error(),
-			})
-		}
-
-		endTime, err := time.Parse(time.RFC3339, et)
-
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": true,
-				"msg":   err.Error(),
-			})
-		}
-
-		res, err := transactionService.ListTransaction(c.Context(), startTime.UTC(), endTime.UTC())
+		res, err := transactionService.ListTransaction(c.Context(), st, et)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": true,

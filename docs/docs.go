@@ -58,14 +58,14 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Start Time",
-                        "name": "start_time",
+                        "name": "startDateTime",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "End Time",
-                        "name": "end_time",
+                        "name": "endDateTime",
                         "in": "query",
                         "required": true
                     }
