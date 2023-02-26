@@ -37,6 +37,51 @@ const docTemplate = `{
             }
         },
         "/v1/transaction": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get transaction.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaction"
+                ],
+                "summary": "get transaction",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start Time",
+                        "name": "start_time",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "End Time",
+                        "name": "end_time",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/repo.Transaction"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -61,7 +106,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.TransactionRequest"
+                            "$ref": "#/definitions/http_model.Transaction"
                         }
                     }
                 ],
@@ -69,7 +114,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Transaction"
+                            "$ref": "#/definitions/repo.Transaction"
                         }
                     }
                 }
@@ -77,21 +122,18 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "model.Transaction": {
+        "http_model.Transaction": {
             "type": "object",
             "properties": {
                 "amount": {
                     "type": "number"
                 },
-                "created_at": {
+                "datetime": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer"
                 }
             }
         },
-        "model.TransactionRequest": {
+        "repo.Transaction": {
             "type": "object",
             "properties": {
                 "amount": {

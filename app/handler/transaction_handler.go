@@ -10,6 +10,7 @@ import (
 
 func NewTransactionHandler(app fiber.Router, transactionService service.ITransactionService) {
 	app.Post("/transaction", CreateTransaction(transactionService))
+	app.Get("/transaction", GetTransaction(transactionService))
 }
 
 // CreateTransaction func create transaction.
@@ -18,8 +19,8 @@ func NewTransactionHandler(app fiber.Router, transactionService service.ITransac
 // @Tags Transaction
 // @Accept json
 // @Produce json
-// @Param transaction body model.TransactionRequest true "Transaction"
-// @Success 200 {object} model.Transaction
+// @Param transaction body http_model.Transaction true "Transaction"
+// @Success 200 {object} repo.Transaction
 // @Security ApiKeyAuth
 // @Router /v1/transaction [post]
 func CreateTransaction(transactionService service.ITransactionService) fiber.Handler {
@@ -33,7 +34,7 @@ func CreateTransaction(transactionService service.ITransactionService) fiber.Han
 			})
 		}
 
-		createdAt, err := time.Parse(time.RFC3339, body.CreatedAt)
+		createdAt, err := time.Parse(time.RFC3339, body.DateTime)
 
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -43,11 +44,11 @@ func CreateTransaction(transactionService service.ITransactionService) fiber.Han
 		}
 
 		param := repo.Transaction{
-			CreatedAt: createdAt,
+			CreatedAt: createdAt.UTC(),
 			Amount:    body.Amount,
 		}
 
-		err = transactionService.AddTransaction(param)
+		err = transactionService.AddTransaction(c.Context(), param)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": true,
@@ -60,5 +61,52 @@ func CreateTransaction(transactionService service.ITransactionService) fiber.Han
 			"error": false,
 			"msg":   "Success inserted transaction",
 		})
+	}
+}
+
+// GetTransaction func get transaction.
+// @Description Get transaction.
+// @Summary get transaction
+// @Tags Transaction
+// @Accept json
+// @Produce json
+// @Param start_time query string true "Start Time"
+// @Param end_time query string true "End Time"
+// @Success 200 {object} []repo.Transaction
+// @Security ApiKeyAuth
+// @Router /v1/transaction [get]
+func GetTransaction(transactionService service.ITransactionService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		st := c.Query("start_time")
+		et := c.Query("end_time")
+
+		startTime, err := time.Parse(time.RFC3339, st)
+
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": true,
+				"msg":   err.Error(),
+			})
+		}
+
+		endTime, err := time.Parse(time.RFC3339, et)
+
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": true,
+				"msg":   err.Error(),
+			})
+		}
+
+		res, err := transactionService.ListTransaction(c.Context(), startTime.UTC(), endTime.UTC())
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": true,
+				"msg":   err.Error(),
+			})
+		}
+
+		// Return status 200 OK.
+		return c.JSON(res)
 	}
 }

@@ -20,7 +20,7 @@ services:
     depends_on:
       - database
     command: -source=file://migrations -database postgres://PG_USER:PG_PASS@database:5432/db?sslmode=disable up
-    restart: on-failure
+#    restart: on-failure
     networks:
       - new
     links:
