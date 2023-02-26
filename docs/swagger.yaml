@@ -37,12 +37,12 @@ paths:
       parameters:
       - description: Start Time
         in: query
-        name: start_time
+        name: startDateTime
         required: true
         type: string
       - description: End Time
         in: query
-        name: end_time
+        name: endDateTime
         required: true
         type: string
       produces:

@@ -5,10 +5,10 @@
 package mock_service
 
 import (
+	http_model "btc/app/model/http-model"
 	repo "btc/app/model/repo"
 	context "context"
 	reflect "reflect"
-	time "time"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -37,7 +37,7 @@ func (m *MockITransactionService) EXPECT() *MockITransactionServiceMockRecorder 
 }
 
 // AddTransaction mocks base method.
-func (m *MockITransactionService) AddTransaction(ctx context.Context, trx repo.Transaction) error {
+func (m *MockITransactionService) AddTransaction(ctx context.Context, trx http_model.Transaction) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddTransaction", ctx, trx)
 	ret0, _ := ret[0].(error)
@@ -51,16 +51,16 @@ func (mr *MockITransactionServiceMockRecorder) AddTransaction(ctx, trx interface
 }
 
 // ListTransaction mocks base method.
-func (m *MockITransactionService) ListTransaction(ctx context.Context, startTime, endTime time.Time) (*[]repo.Transaction, error) {
+func (m *MockITransactionService) ListTransaction(ctx context.Context, startTimeStr, endTimeStr string) (*[]repo.Transaction, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListTransaction", ctx, startTime, endTime)
+	ret := m.ctrl.Call(m, "ListTransaction", ctx, startTimeStr, endTimeStr)
 	ret0, _ := ret[0].(*[]repo.Transaction)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListTransaction indicates an expected call of ListTransaction.
-func (mr *MockITransactionServiceMockRecorder) ListTransaction(ctx, startTime, endTime interface{}) *gomock.Call {
+func (mr *MockITransactionServiceMockRecorder) ListTransaction(ctx, startTimeStr, endTimeStr interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTransaction", reflect.TypeOf((*MockITransactionService)(nil).ListTransaction), ctx, startTime, endTime)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTransaction", reflect.TypeOf((*MockITransactionService)(nil).ListTransaction), ctx, startTimeStr, endTimeStr)
 }
