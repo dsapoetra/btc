@@ -44,7 +44,7 @@ func CreateTransaction(transactionService service.ITransactionService) fiber.Han
 		}
 
 		param := repo.Transaction{
-			CreatedAt: createdAt,
+			CreatedAt: createdAt.Local(),
 			Amount:    body.Amount,
 		}
 
