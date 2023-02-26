@@ -31,7 +31,7 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Create transaction.",
+                "description": "Get transaction.",
                 "consumes": [
                     "application/json"
                 ],
@@ -41,7 +41,7 @@
                 "tags": [
                     "Transaction"
                 ],
-                "summary": "create transaction",
+                "summary": "get transaction",
                 "parameters": [
                     {
                         "type": "string",
@@ -62,7 +62,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/repo.Transaction"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/repo.Transaction"
+                            }
                         }
                     }
                 }
@@ -113,7 +116,7 @@
                 "amount": {
                     "type": "number"
                 },
-                "created_at": {
+                "datetime": {
                     "type": "string"
                 }
             }

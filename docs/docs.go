@@ -43,7 +43,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Create transaction.",
+                "description": "Get transaction.",
                 "consumes": [
                     "application/json"
                 ],
@@ -53,7 +53,7 @@ const docTemplate = `{
                 "tags": [
                     "Transaction"
                 ],
-                "summary": "create transaction",
+                "summary": "get transaction",
                 "parameters": [
                     {
                         "type": "string",
@@ -74,7 +74,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/repo.Transaction"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/repo.Transaction"
+                            }
                         }
                     }
                 }
@@ -125,7 +128,7 @@ const docTemplate = `{
                 "amount": {
                     "type": "number"
                 },
-                "created_at": {
+                "datetime": {
                     "type": "string"
                 }
             }

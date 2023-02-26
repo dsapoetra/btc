@@ -5,7 +5,6 @@ import (
 	"btc/app/model/repo"
 	"btc/app/service"
 	"github.com/gofiber/fiber/v2"
-	"log"
 	"time"
 )
 
@@ -35,7 +34,7 @@ func CreateTransaction(transactionService service.ITransactionService) fiber.Han
 			})
 		}
 
-		createdAt, err := time.Parse(time.RFC3339, body.CreatedAt)
+		createdAt, err := time.Parse(time.RFC3339, body.DateTime)
 
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -49,7 +48,7 @@ func CreateTransaction(transactionService service.ITransactionService) fiber.Han
 			Amount:    body.Amount,
 		}
 
-		err = transactionService.AddTransaction(param)
+		err = transactionService.AddTransaction(c.Context(), param)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": true,
@@ -65,15 +64,15 @@ func CreateTransaction(transactionService service.ITransactionService) fiber.Han
 	}
 }
 
-// GetTransaction func create transaction.
-// @Description Create transaction.
-// @Summary create transaction
+// GetTransaction func get transaction.
+// @Description Get transaction.
+// @Summary get transaction
 // @Tags Transaction
 // @Accept json
 // @Produce json
 // @Param start_time query string true "Start Time"
 // @Param end_time query string true "End Time"
-// @Success 200 {object} repo.Transaction
+// @Success 200 {object} []repo.Transaction
 // @Security ApiKeyAuth
 // @Router /v1/transaction [get]
 func GetTransaction(transactionService service.ITransactionService) fiber.Handler {
@@ -81,11 +80,7 @@ func GetTransaction(transactionService service.ITransactionService) fiber.Handle
 		st := c.Query("start_time")
 		et := c.Query("end_time")
 
-		log.Println("Start Time string: ", st)
-
 		startTime, err := time.Parse(time.RFC3339, st)
-
-		log.Println("Start Time: ", startTime)
 
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -95,7 +90,7 @@ func GetTransaction(transactionService service.ITransactionService) fiber.Handle
 		}
 
 		endTime, err := time.Parse(time.RFC3339, et)
-		log.Println("End Time: ", endTime)
+
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": true,
@@ -103,7 +98,7 @@ func GetTransaction(transactionService service.ITransactionService) fiber.Handle
 			})
 		}
 
-		res, err := transactionService.ListTransaction(startTime, endTime)
+		res, err := transactionService.ListTransaction(c.Context(), startTime, endTime)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": true,
@@ -112,9 +107,6 @@ func GetTransaction(transactionService service.ITransactionService) fiber.Handle
 		}
 
 		// Return status 200 OK.
-		return c.JSON(fiber.Map{
-			"error": false,
-			"msg":   res,
-		})
+		return c.JSON(res)
 	}
 }

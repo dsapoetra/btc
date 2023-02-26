@@ -3,7 +3,7 @@ definitions:
     properties:
       amount:
         type: number
-      created_at:
+      datetime:
         type: string
     type: object
   repo.Transaction:
@@ -33,7 +33,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Create transaction.
+      description: Get transaction.
       parameters:
       - description: Start Time
         in: query
@@ -51,10 +51,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/repo.Transaction'
+            items:
+              $ref: '#/definitions/repo.Transaction'
+            type: array
       security:
       - ApiKeyAuth: []
-      summary: create transaction
+      summary: get transaction
       tags:
       - Transaction
     post:
