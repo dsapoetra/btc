@@ -42,9 +42,9 @@ func Test_Post_Transaction(t *testing.T) {
 			expectedError: false,
 			expectedCode:  200,
 			expectedBody:  "{\"error\":false,\"msg\":\"Success inserted transaction\"}",
-			requestBody:   "{\"amount\":100,\"datetime\":\"2006-01-02T00:00:00+07:00\"}",
+			requestBody:   "{\"amount\":100,\"datetime\":\"2006-01-02T00:00:00+00:00\"}",
 			prepare: func(f *TransactionHandler) {
-				createdAt := "2006-01-02T00:00:00+07:00"
+				createdAt := "2006-01-02T00:00:00+00:00"
 				timeCreated, _ := time.Parse(time.RFC3339, createdAt)
 				timeCreated = timeCreated.Local()
 
@@ -67,9 +67,9 @@ func Test_Post_Transaction(t *testing.T) {
 			expectedError: false,
 			expectedCode:  400,
 			expectedBody:  "{\"error\":true,\"msg\":\"amount can't be zero\"}",
-			requestBody:   "{\"amount\":0,\"datetime\":\"2006-01-02T00:00:00+07:00\"}",
+			requestBody:   "{\"amount\":0,\"datetime\":\"2006-01-02T00:00:00+00:00\"}",
 			prepare: func(f *TransactionHandler) {
-				createdAt := "2006-01-02T00:00:00+07:00"
+				createdAt := "2006-01-02T00:00:00+00:00"
 				timeCreated, _ := time.Parse(time.RFC3339, createdAt)
 
 				trxRepo := repo.Transaction{CreatedAt: timeCreated.Local(), Amount: 0}
@@ -122,9 +122,9 @@ func Test_Get_Transaction(t *testing.T) {
 		mockService *mock_service.MockITransactionService
 	}
 
-	timeNow, _ := time.Parse(time.RFC3339, "2023-02-26T22:05:52+07:00")
+	timeNow, _ := time.Parse(time.RFC3339, "2023-02-26T22:05:52+00:00")
 	timeNowInput := timeNow.Format(time.RFC3339)
-	timeHourLater, _ := time.Parse(time.RFC3339, "2023-02-26T23:05:52+07:00")
+	timeHourLater, _ := time.Parse(time.RFC3339, "2023-02-26T23:05:52+00:00")
 	timeHourLaterInput := timeHourLater.Format(time.RFC3339)
 
 	trxRepo := &[]repo.Transaction{
