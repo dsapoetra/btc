@@ -34,3 +34,10 @@ go test -v ./...
 ```
 make mock-gen
 ```
+
+
+## To develop list
+
+- [ ] add unit test
+- [ ] add integration test
+- [ ] add donation every hundredth transaction
